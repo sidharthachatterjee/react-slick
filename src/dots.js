@@ -25,32 +25,55 @@ export var Dots = React.createClass({
       slidesToScroll: this.props.slidesToScroll
     });
 
-    // Apply join & split to Array to pre-fill it for IE8
-    //
-    // Credit: http://stackoverflow.com/a/13735425/1849458
-    var dots = Array.apply(null, Array(dotCount + 1).join('0').split('')).map((x, i) => {
+    var dots;
+    
+    if (this.props.newDots) {
 
-      var leftBound = (i * this.props.slidesToScroll);
-      var rightBound = (i * this.props.slidesToScroll) + (this.props.slidesToScroll - 1);
-      var className = classnames({
-        'slick-active': (this.props.currentSlide >= leftBound) && (this.props.currentSlide <= rightBound)
+        var className = classnames({
+          'slick-active': true
+        });
+
+        var dotOptions = {
+          message: 'dots',
+          slidesToScroll: this.props.slidesToScroll,
+          currentSlide: this.props.currentSlide
+        };
+
+        var onClick = this.clickHandler.bind(this, dotOptions);
+
+        dots = (
+          <span className={className}>
+            {React.cloneElement(this.props.customPaging(this.props.currentSlide), {onClick})}
+          </span>
+        );
+    } else {
+      // Apply join & split to Array to pre-fill it for IE8
+      //
+      // Credit: http://stackoverflow.com/a/13735425/1849458
+      dots = Array.apply(null, Array(dotCount + 1).join('0').split('')).map((x, i) => {
+
+        var leftBound = (i * this.props.slidesToScroll);
+        var rightBound = (i * this.props.slidesToScroll) + (this.props.slidesToScroll - 1);
+        var className = classnames({
+          'slick-active': (this.props.currentSlide >= leftBound) && (this.props.currentSlide <= rightBound)
+        });
+
+        var dotOptions = {
+          message: 'dots',
+          index: i,
+          slidesToScroll: this.props.slidesToScroll,
+          currentSlide: this.props.currentSlide
+        };
+
+        var onClick = this.clickHandler.bind(this, dotOptions);
+
+        return (
+          <li key={i} className={className}>
+            {React.cloneElement(this.props.customPaging(i), {onClick})}
+          </li>
+        );
       });
-
-      var dotOptions = {
-        message: 'dots',
-        index: i,
-        slidesToScroll: this.props.slidesToScroll,
-        currentSlide: this.props.currentSlide
-      };
-
-      var onClick = this.clickHandler.bind(this, dotOptions);
-
-      return (
-        <li key={i} className={className}>
-          {React.cloneElement(this.props.customPaging(i), {onClick})}
-        </li>
-      );
-    });
+    }
 
     return (
       <ul className={this.props.dotsClass} style={{display: 'block'}}>
